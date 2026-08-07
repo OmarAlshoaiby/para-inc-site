@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://omaralshoaiby.github.io/para-inc-site/sitemap.xml
