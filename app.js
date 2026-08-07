@@ -3,6 +3,8 @@ const BTC_ADDR = "364o5WYNJ1haHo1Boev2e3Kz3fGyeB9DfA";
 const ETH_ADDR = "0xABF1Ef597CC830f801B8783d5f29780B452bc39B";
 const USDT_ADDR = "0xABF1Ef597CC830f801B8783d5f29780B452bc39B";
 const USDT_CONTRACT = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
+// Measurement beacon: Para-Inc server logs every store open. Updated per tunnel cycle.
+const BEACON = "https://phantom-islands-vocals-continuity.trycloudflare.com/beacon";
 
 // Each product: id, title, priceUSD, file (download path), items[]
 const PRODUCTS = [
