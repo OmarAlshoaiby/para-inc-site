@@ -1,110 +1,73 @@
-// Para-Inc storefront client logic — data-driven, multi-tier catalog.
-const BTC_ADDR = "364o5WYNJ1haHo1Boev2e3Kz3fGyeB9DfA";
-const ETH_ADDR = "0xABF1Ef597CC830f801B8783d5f29780B452bc39B";
-const USDT_ADDR = "0xABF1Ef597CC830f801B8783d5f29780B452bc39B";
-const USDT_CONTRACT = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
+// ===== Para-Inc site config (fill before deploy) =====
+const CONFIG = {
+  // Contact + work requests via GitHub Issues (no email/KYC needed):
+  SERVICE_ISSUE_URL: "https://github.com/OmarAlshoaiby/para-inc-site/issues/new?title=Automation%20request&body=Describe%20what%20you%20want%20automated%20and%20your%20budget%20(%24200%2F%24500%2F%241000).%20Services%20paid%20in%20crypto%20to%20the%20Para-Inc%20wallets.",
+  // Crypto wallets (verified, owned by Omar/Para-Inc):
+  BTC_ADDR: "bc1q579hezg4jcnja063wfpatufp345f5g2pmz6xkt",
+  ETH_ADDR: "0xc6021f8a10a4dadd564310180292fb7548183252",
+  PRODUCT_USD: 10
+};
+// ====================================================
 
-// Each product: id, title, priceUSD, file (download path), blurb, items[]
-const PRODUCTS = [
-  { id:"starter", title:"AI & Automation Starter Pack", usd:10,
-    file:"bundle/para-inc-starter-pack.zip",
-    items:["The AI Automation Playbook","Prompt Engineering Field Manual","The Solo Founder's Systems Kit"] },
-  { id:"hustle", title:"AI Side-Hustle Playbook + Client Magnet Scripts", usd:29,
-    file:"bundle/ai-sidehustle-bundle.zip",
-    items:["AI Side-Hustle Playbook (5 pages)","Client Magnet Scripts (copy-paste outreach)"] },
-  { id:"full", title:"The Complete Para-Inc Bundle", usd:49,
-    file:"bundle/para-inc-complete-bundle.zip",
-    items:["All Starter Pack PDFs","Both new playbooks","Free preview + future updates"] },
-];
+const USD = CONFIG.PRODUCT_USD;
+let coin = "BTC";
+const RATES = { BTC: 64000, ETH: 3100 };
 
-const RATES = { BTC: 64000, ETH: 3100, USDT: 1 };
-let cur = PRODUCTS[0];
+function fmt(n, d){ return n.toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); }
 
-function fmt(n,d){ return n.toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}); }
+document.querySelectorAll("#cta-service").forEach(el => {
+  el.href = CONFIG.SERVICE_ISSUE_URL;
+  el.target = "_blank";
+  el.rel = "noopener";
+});
 
 async function price(){
   try{
-    const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether&vs_currencies=usd");
+    const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd");
     const j = await r.json();
-    RATES.BTC = j.bitcoin.usd; RATES.ETH = j.ethereum.usd; RATES.USDT = j.tether.usd;
+    RATES.BTC = j.bitcoin.usd; RATES.ETH = j.ethereum.usd;
   }catch(e){}
-  renderProducts();
+  render();
 }
-
-function renderProducts(){
-  const grid = document.getElementById("products");
-  grid.innerHTML = "";
-  PRODUCTS.forEach(p=>{
-    const btc = p.usd / RATES.BTC, eth = p.usd / RATES.ETH, usdt = p.usd / RATES.USDT;
-    const card = document.createElement("div");
-    card.className = "prod";
-    card.innerHTML = `
-      <div class="ptitle">${p.title}</div>
-      <div class="price">$${p.usd} <span class="life">/ lifetime, instant download</span></div>
-      <ul class="pitems">${p.items.map(i=>`<li>${i}</li>`).join("")}</ul>
-      <div class="tabs">
-        <div class="tab on" data-c="BTC" onclick="sel('${p.id}','BTC',this)">Bitcoin</div>
-        <div class="tab" data-c="ETH" onclick="sel('${p.id}','ETH',this)">Ethereum</div>
-        <div class="tab" data-c="USDT" onclick="sel('${p.id}','USDT',this)">USDT</div>
-      </div>
-      <div id="${p.id}-BTC"><div class="amt">${fmt(btc,8)} BTC</div><div class="addr">${BTC_ADDR}</div></div>
-      <div id="${p.id}-ETH" style="display:none"><div class="amt">${fmt(eth,6)} ETH</div><div class="addr">${ETH_ADDR}</div></div>
-      <div id="${p.id}-USDT" style="display:none"><div class="amt">${fmt(usdt,2)} USDT</div><div class="addr">${USDT_ADDR}</div></div>
-      <label class="lbl">Transaction ID / Hash</label>
-      <input id="${p.id}-txid" placeholder="paste txid or 0x... hash" autocomplete="off">
-      <button onclick="verify('${p.id}')">Verify & Unlock</button>
-      <div class="msg" id="${p.id}-msg"></div>
-      <div class="dl" id="${p.id}-dl"><a href="${p.file}" download>Download ${p.title} (ZIP)</a></div>`;
-    grid.appendChild(card);
-  });
+function render(){
+  const btc = USD / RATES.BTC, eth = USD / RATES.ETH;
+  document.getElementById("btcAmt").textContent = fmt(btc,8) + " BTC ≈ $" + USD;
+  document.getElementById("btcAddr").textContent = CONFIG.BTC_ADDR;
+  document.getElementById("ethAmt").textContent = fmt(eth,6) + " ETH ≈ $" + USD;
+  document.getElementById("ethAddr").textContent = CONFIG.ETH_ADDR;
+  window._btc = btc; window._eth = eth;
 }
-
-function sel(id, coin, el){
-  ["BTC","ETH","USDT"].forEach(c=>{
-    document.getElementById(`${id}-${c}`).style.display = c===coin?"block":"none";
-  });
-  const tabs = el.parentElement.querySelectorAll(".tab");
-  tabs.forEach(t=>t.classList.toggle("on", t.dataset.c===coin));
+function sel(c){
+  coin = c;
+  document.getElementById("tBTC").classList.toggle("on", c==="BTC");
+  document.getElementById("tETH").classList.toggle("on", c==="ETH");
+  document.getElementById("BTC").style.display = c==="BTC"?"block":"none";
+  document.getElementById("ETH").style.display = c==="ETH"?"block":"none";
 }
-
-async function verify(id){
-  const p = PRODUCTS.find(x=>x.id===id);
-  const coin = [...document.getElementById(`${id}-BTC`).parentElement.querySelectorAll(".tab")].find(t=>t.classList.contains("on")).dataset.c;
-  const txid = document.getElementById(`${id}-txid`).value.trim();
-  const msg = document.getElementById(`${id}-msg`);
-  const dl = document.getElementById(`${id}-dl`);
-  msg.className="msg"; msg.textContent=""; dl.style.display="none";
+async function verify(){
+  const txid = document.getElementById("txid").value.trim();
+  const msg = document.getElementById("msg");
+  msg.className = "msg"; msg.textContent = "";
   if(!txid){ msg.className="msg err"; msg.textContent="Paste your transaction ID first."; return; }
-  msg.className="msg"; msg.textContent="Verifying on-chain…";
-  const slack = 0.98;
+  msg.textContent="Verifying on-chain…";
   try{
-    let ok=false;
-    if(coin==="BTC"){
-      const tx = await (await fetch("https://blockstream.info/api/tx/"+txid)).json();
-      const sats = tx.vout.filter(o=>o.scriptpubkey_address===BTC_ADDR).reduce((a,o)=>a+Math.round(o.value),0);
-      ok = sats >= Math.round((p.usd/RATES.BTC)*1e8*slack);
-    } else if(coin==="ETH"){
-      const r = await fetch("https://api.etherscan.io/v2/api?chainid=1&module=proxy&action=eth_getTransactionByHash&txhash="+txid);
-      const d = (await r.json()).result;
-      if(!d || !d.to) throw new Error("tx not found");
-      if(d.to.toLowerCase()===ETH_ADDR.toLowerCase()){
-        ok = parseInt(d.value,16)/1e18 >= (p.usd/RATES.ETH)*slack;
-      }
-    } else {
-      const r = await fetch("https://api.etherscan.io/v2/api?chainid=1&module=proxy&action=eth_getTransactionByHash&txhash="+txid);
-      const d = (await r.json()).result;
-      if(!d || !d.to) throw new Error("tx not found");
-      if(d.to.toLowerCase()===USDT_CONTRACT.toLowerCase()){
-        const inp=(d.input||"").toLowerCase();
-        if(inp.startsWith("0xa9059cbb")){
-          const amt=parseInt(inp.slice(10+40,10+40+64),16)/1e6;
-          ok = amt >= (p.usd/RATES.USDT)*slack;
-        }
-      }
-    }
-    if(ok){ msg.className="msg ok"; msg.textContent="Confirmed. Download unlocked."; dl.style.display="block"; }
-    else { msg.className="msg err"; msg.textContent="No $"+p.usd+"+ payment to Para-Inc found yet. If you just sent it, wait 1 confirmation and retry."; }
+    let ok = coin==="BTC" ? await checkBTC(txid) : await checkETH(txid);
+    if(ok){ msg.className="msg ok"; msg.textContent="✓ Confirmed. Your download is unlocked."; document.getElementById("dl").style.display="block"; }
+    else{ msg.className="msg err"; msg.textContent="Could not confirm a $"+USD+"+ payment to the Para-Inc address yet. Wait for 1 confirmation and retry, or contact Para-Inc."; }
   }catch(e){ msg.className="msg err"; msg.textContent="Verification error: "+e.message; }
 }
-
+async function checkBTC(txid){
+  const r = await fetch("https://blockstream.info/api/tx/"+txid);
+  if(!r.ok) throw new Error("tx not found");
+  const j = await r.json();
+  const sats = j.vout.filter(o=>o.scriptpubkey_address===CONFIG.BTC_ADDR).reduce((a,o)=>a+Math.round(o.value),0);
+  return sats >= Math.round(window._btc*1e8*0.98);
+}
+async function checkETH(txid){
+  const r = await fetch("https://api.etherscan.io/api?module=proxy&action=eth_getTransactionByHash&txhash="+txid);
+  const data = (await r.json()).result;
+  if(!data || !data.to) throw new Error("tx not found on Etherscan");
+  if((data.to||"").toLowerCase() !== CONFIG.ETH_ADDR.toLowerCase()) return false;
+  return parseInt(data.value,16)/1e18 >= window._eth*0.98;
+}
 price();
