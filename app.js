@@ -18,9 +18,18 @@ const PRODUCTS = [
   { id:"n8n", title:"n8n Workflow Bundle (5 importable automations)", usd:39,
     file:"bundle/n8n-workflow-bundle.zip",
     items:["RSS->Telegram","Gmail->Sheet","Webhook->Discord","Weekly Report","TG Bot Logger","Setup + Credentials + Troubleshooting + docker-compose"] },
+  { id:"seo", title:"AI SEO Programmatic Kit", usd:49,
+    file:"bundle/ai-seo-kit.zip",
+    items:["SEO Publish n8n workflow","E-E-A-T + FAQ prompt","Sitemap + internal-link scripts","SOP"] },
+  { id:"yt", title:"Faceless YouTube Kit", usd:47,
+    file:"bundle/faceless-yt-kit.zip",
+    items:["Faceless Video n8n workflow","Script + Title/Thumbnail prompts","25 niches","Upload checklist"] },
+  { id:"agency", title:"Agency Tier (Resell License + Everything)", usd:99,
+    file:"bundle/agency-tier.zip",
+    items:["All products above","Resell license","Client-reporting workflow"] },
   { id:"full", title:"The Complete Para-Inc Bundle", usd:49,
     file:"bundle/para-inc-complete-bundle.zip",
-    items:["All Starter Pack PDFs","Both new playbooks","Prompt pack","n8n bundle","Free preview + future updates"] },
+    items:["All Starter Pack PDFs","Both playbooks","Prompt pack","n8n bundle","Free preview + future updates"] },
 ];
 
 const RATES = { BTC: 64000, ETH: 3100, USDT: 1 };
