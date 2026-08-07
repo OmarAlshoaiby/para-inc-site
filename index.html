@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Para-Inc — AI Automation & Systems</title>
+<meta name="description" content="Done-for-you AI automation for small business. Get the $10 AI & Automation Starter Pack (crypto, instant download) or a custom build for $200/$500/$1000. Free n8n tools.">
+<meta name="keywords" content="n8n, automation, small business, AI workflows, no-code, lead capture, CRM, free tools">
+<meta property="og:title" content="Para-Inc — AI Automation & Systems">
+<meta property="og:description" content="Done-for-you AI automation for small business. $10 starter pack (crypto) + custom builds $200/$500/$1000. Free n8n tools.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://omaralshoaiby.github.io/para-inc-site/">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Para-Inc","url":"https://omaralshoaiby.github.io/para-inc-site/","description":"AI automation for small business. $10 starter pack + custom builds. Free n8n tools.","sameAs":["https://github.com/OmarAlshoaiby/para-inc-tools"]}</script>
 <style>
   :root{--bg:#0a0e14;--fg:#e6edf3;--acc:#5eead4;--mut:#8b949e;--card:#11161f;--ok:#27c08a;}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -32,13 +40,7 @@
   .msg.err{display:block;background:#311313;color:#ff5d5d;border:1px solid #5b1c1c}
   .dl{display:none;margin-top:16px;padding:14px;border-radius:10px;background:#10301f;border:1px solid #1c5b3c}
   .dl a{color:#7ff0c0;font-weight:700;text-decoration:none}
-  .ptitle{font-size:1.3rem;font-weight:700;color:var(--acc);margin-bottom:6px}
-  .pitems{list-style:none;color:var(--mut);font-size:.92rem;margin:10px 0}
-  .pitems li{padding:4px 0;border-bottom:1px solid #1a2230}
-  .life{font-size:14px;color:var(--mut);font-weight:400}
-  .lbl{display:block;color:var(--mut);margin:14px 0 6px;font-size:.85rem}
-  #products .prod{padding:24px;margin:24px 0}
-  #products input{width:100%;padding:12px;border-radius:9px;border:1px solid #2a2f37;background:#0c0e11;color:var(--fg);font:13px ui-monospace,monospace;margin-top:6px}
+  .pp{display:inline-block;margin-top:12px;background:#0070ba;color:#fff;font-weight:700;padding:12px 22px;border-radius:8px;text-decoration:none}
 </style>
 </head>
 <body>
@@ -68,8 +70,37 @@
     </div>
   </div>
 
-  <h2>Digital Products — pay in crypto, download instantly</h2>
-  <div id="products"><!-- rendered by app.js from the PRODUCTS array --></div>
+  <h2>The $10 Product — AI &amp; Automation Starter Pack</h2>
+  <div class="prod">
+    <div class="price" style="font-size:28px;font-weight:700">$10 <span style="font-size:15px;color:var(--mut)">/ lifetime, instant download</span></div>
+    <ul style="color:var(--mut);margin:8px 0 0;padding-left:18px">
+      <li><b>The AI Automation Playbook</b> — build &amp; run automations with free tools.</li>
+      <li><b>Prompt Engineering Field Manual</b> — copy-paste templates.</li>
+      <li><b>The Solo Founder's Systems Kit</b> — operating loops &amp; money tracker.</li>
+    </ul>
+
+    <div class="tabs">
+      <div class="tab on" id="tBTC" onclick="sel('BTC')">Pay in Bitcoin</div>
+      <div class="tab" id="tETH" onclick="sel('ETH')">Pay in Ethereum</div>
+    </div>
+    <div id="BTC">
+      <div class="amt" id="btcAmt">…</div>
+      <div class="addr" id="btcAddr"></div>
+      <p style="color:var(--mut);font-size:13px">Send the exact amount above to this address, then paste the transaction ID to unlock your download instantly.</p>
+    </div>
+    <div id="ETH" style="display:none">
+      <div class="amt" id="ethAmt">…</div>
+      <div class="addr" id="ethAddr"></div>
+      <p style="color:var(--mut);font-size:13px">Send the exact amount above (native ETH) to this address, then paste the transaction hash to unlock instantly.</p>
+    </div>
+    <label style="display:block;color:var(--mut);margin:14px 0 6px">Transaction ID / Hash</label>
+    <input id="txid" placeholder="paste txid or 0x… hash" autocomplete="off" style="width:100%;padding:12px;border-radius:9px;border:1px solid #2a2f37;background:#0c0e11;color:var(--fg);font:13px ui-monospace,monospace">
+    <button onclick="verify()">Verify &amp; Unlock</button>
+    <div class="msg" id="msg"></div>
+    <div class="dl" id="dl">✓ Payment verified on-chain. Your pack is ready:<br>
+      <a href="bundle/para-inc-starter-pack.zip" download>⬇ Download Para-Inc Starter Pack (ZIP)</a>
+    </div>
+  </div>
 
   <h2>Services — live now</h2>
   <div class="prod">
@@ -78,7 +109,12 @@
     <p style="color:var(--mut);font-size:13px;margin-top:12px">Need a custom build? Grab the pack and open an issue — we prioritize pack owners.</p>
   </div>
 
-  <p class="foot">Para-Inc — operated by Carnage OS on behalf of Para-Inc. Services via GitHub Issues, paid in crypto. Product paid in crypto, verified on-chain. First $1000 bootstrapped at $0 cost. · <a href="https://github.com/OmarAlshoaiby/para-inc-tools" target="_blank" rel="noopener" style="color:var(--acc)">Free automation tools →</a></p>
+  <p class="foot">Para-Inc — operated by Carnage OS on behalf of Para-Inc. Services via GitHub Issues, paid in crypto. Product paid in crypto, verified on-chain. First $1000 bootstrapped at $0 cost. · <a href="https://github.com/OmarAlshoaiby/para-inc-tools" target="_blank" rel="noopener" style="color:var(--acc)">Free automation tools →</a> · <a href="guide.html" style="color:var(--acc)">Free n8n automations guide →</a></p>
+  <div class="prod" style="margin-top:24px;text-align:center">
+    <p style="color:var(--mut)">If Para-Inc's free tools saved you time, tip in crypto — every satoshi is real revenue:</p>
+    <div class="addr" style="display:inline-block;margin:8px 0">BTC: bc1q579hezg4jcnja063wfpatufp345f5g2pmz6xkt</div><br>
+    <div class="addr" style="display:inline-block;margin:8px 0">ETH: 0xc6021f8a10a4dadd564310180292fb7548183252</div>
+  </div>
 </div>
 <script src="app.js"></script>
 </body>
