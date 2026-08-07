@@ -12,9 +12,15 @@ const PRODUCTS = [
   { id:"hustle", title:"AI Side-Hustle Playbook + Client Magnet Scripts", usd:29,
     file:"bundle/ai-sidehustle-bundle.zip",
     items:["AI Side-Hustle Playbook (5 pages)","Client Magnet Scripts (copy-paste outreach)"] },
+  { id:"prompt", title:"Vertical Prompt Pack (Agency / Solopreneur / Freelancer)", usd:19,
+    file:"bundle/prompt-pack-bundle.zip",
+    items:["Agency Cold Outreach prompts","Solo Founder Systems prompts","Freelancer Proposal prompts","Chained recipes + Quickstart"] },
+  { id:"n8n", title:"n8n Workflow Bundle (5 importable automations)", usd:39,
+    file:"bundle/n8n-workflow-bundle.zip",
+    items:["RSS->Telegram","Gmail->Sheet","Webhook->Discord","Weekly Report","TG Bot Logger","Setup + Credentials + Troubleshooting + docker-compose"] },
   { id:"full", title:"The Complete Para-Inc Bundle", usd:49,
     file:"bundle/para-inc-complete-bundle.zip",
-    items:["All Starter Pack PDFs","Both new playbooks","Free preview + future updates"] },
+    items:["All Starter Pack PDFs","Both new playbooks","Prompt pack","n8n bundle","Free preview + future updates"] },
 ];
 
 const RATES = { BTC: 64000, ETH: 3100, USDT: 1 };
