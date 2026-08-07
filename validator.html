@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Para-Inc n8n Workflow Validator (FREE)</title>
+<meta name="description" content="Free, browser-only n8n workflow validator. Paste your workflow JSON to catch broken connections, missing nodes, and dangling edges. No upload, no server.">
+<style>
+  :root{--bg:#0a0e14;--fg:#e6edf3;--acc:#5eead4;--mut:#8b949e;--card:#11161f;--ok:#27c08a;--err:#ff5d5d}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--fg);line-height:1.6}
+  .wrap{max-width:900px;margin:0 auto;padding:40px 24px}
+  h1{font-size:2rem;margin-bottom:8px}
+  .tag{color:var(--acc);font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-size:.8rem}
+  .sub{color:var(--mut);margin:12px 0 24px}
+  textarea{width:100%;height:240px;background:#0c0e11;border:1px solid #23272e;border-radius:10px;color:var(--fg);font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;padding:14px}
+  button{margin-top:14px;padding:13px 22px;border:0;border-radius:9px;background:var(--acc);color:#04110d;font-weight:700;cursor:pointer;font-size:15px}
+  .report{margin-top:18px;padding:16px;border-radius:10px;background:var(--card);border:1px solid #23272e;display:none}
+  .report.show{display:block}
+  .line{padding:6px 0;border-bottom:1px solid #1a2230;font-size:.92rem}
+  .pass{color:var(--ok)} .fail{color:var(--err)} .warn{color:#f0c040}
+  .tip{margin-top:30px;padding:20px;border-radius:12px;background:var(--card);border:1px solid #23272e}
+  .addr{font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;word-break:break-all;background:#0c0e11;border:1px solid #23272e;border-radius:8px;padding:10px;color:#cfe0ff;margin:8px 0}
+  .foot{color:var(--mut);font-size:.85rem;margin-top:30px;border-top:1px solid #1f2937;padding-top:18px}
+  a{color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tag">Para-Inc · Free Tool</div>
+  <h1>n8n Workflow Validator</h1>
+  <p class="sub">Paste an exported n8n workflow JSON. It validates 100% in your browser — nothing is uploaded. Catches broken connections, missing nodes, and dangling edges.</p>
+  <textarea id="wf" placeholder='{"nodes":[...],"connections":{...}}'></textarea>
+  <br><button id="run">Validate workflow</button>
+  <div class="report" id="report"></div>
+
+  <div class="tip">
+    <h3 style="color:var(--acc);margin-bottom:8px">Found this useful? Tip Para-Inc in crypto</h3>
+    <div class="addr">BTC: bc1q579hezg4jcnja063wfpatufp345f5g2pmz6xkt</div>
+    <div class="addr">ETH: 0xc6021f8a10a4dadd564310180292fb7548183252</div>
+    <p style="color:var(--mut);font-size:.9rem;margin-top:8px">Get the $10 AI &amp; Automation Starter Pack: <a href="./">para-inc-site</a> · CLI version: <a href="https://github.com/OmarAlshoaiby/para-inc-tools">para-inc-tools</a></p>
+  </div>
+
+  <p class="foot">Para-Inc builds free automation tooling. Operated autonomously by Carnage OS. · <a href="./">Home</a> · <a href="guide.html">Free n8n guide</a></p>
+</div>
+<script>
+function nodeIds(wf){ return new Set((wf.nodes||[]).map(n=>n.name)); }
+function validate(text){
+  const out=[];
+  let wf;
+  try { wf=JSON.parse(text); }
+  catch(e){ return [{cls:'fail',msg:'Invalid JSON: '+e.message}]; }
+  if(!wf.nodes || !Array.isArray(wf.nodes)) out.push({cls:'fail',msg:'Missing or non-array "nodes".'});
+  if(!wf.connections) out.push({cls:'fail',msg:'Missing "connections" object.'});
+  const ids=nodeIds(wf);
+  if(wf.nodes) out.push({cls:'pass',msg:'Nodes: '+wf.nodes.length});
+  // dangling connections: source/target node names not present
+  let edges=0, dangling=0;
+  if(wf.connections){
+    for(const src in wf.connections){
+      if(!ids.has(src)){ out.push({cls:'fail',msg:'Connection source "'+src+'" is not a node.'}); }
+      const mains=wf.connections[src].main||[];
+      mains.forEach(arr=> (arr||[]).forEach(t=>{
+        edges++;
+        if(!t || !t.node){ out.push({cls:'warn',msg:'Edge from "'+src+'" has no target node.'}); dangling++; }
+        else if(!ids.has(t.node)){ out.push({cls:'fail',msg:'Edge from "'+src+'" -> "'+t.node+'" targets a missing node.'}); dangling++; }
+      }));
+    }
+  }
+  if(edges>0) out.push({cls:'pass',msg:'Connections: '+edges+' edge(s), '+dangling+' dangling.'});
+  else out.push({cls:'warn',msg:'No connections found — workflow has no wiring.'});
+  // duplicate node names
+  const seen={}, dup=[];
+  (wf.nodes||[]).forEach(n=>{ if(seen[n.name]) dup.push(n.name); seen[n.name]=1; });
+  if(dup.length) out.push({cls:'warn',msg:'Duplicate node names: '+dup.join(', ')});
+  if(!out.some(o=>o.cls==='fail')) out.push({cls:'pass',msg:'✓ No hard errors. Workflow structure looks valid.'});
+  return out;
+}
+document.getElementById('run').onclick=function(){
+  const r=document.getElementById('report');
+  const res=validate(document.getElementById('wf').value);
+  r.innerHTML=res.map(x=>'<div class="line '+x.cls+'">'+x.msg+'</div>').join('');
+  r.classList.add('show');
+};
+</script>
+</body>
+</html>
