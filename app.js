@@ -3,6 +3,7 @@ const BTC_ADDR = "3GGthKRSEGZuahuB8RdJkyRaSPCPYPojCS";
 const ETH_ADDR = "0x33586ACD46D49c3D5c45b3F72b03e5b39b9D7851";
 const USDT_ADDR = "0x33586ACD46D49c3D5c45b3F72b03e5b39b9D7851";
 const USDT_CONTRACT = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
+const PP_URL = "https://paypal.me/OmarShoaib215";
 // Measurement beacon: Para-Inc server logs every store open. Updated per tunnel cycle.
 const BEACON = "https://phantom-islands-vocals-continuity.trycloudflare.com/beacon";
 
@@ -64,11 +65,13 @@ function renderProducts(){
         <div class="tab on" data-c="BTC" onclick="sel('${p.id}','BTC',this)">Bitcoin</div>
         <div class="tab" data-c="ETH" onclick="sel('${p.id}','ETH',this)">Ethereum</div>
         <div class="tab" data-c="USDT" onclick="sel('${p.id}','USDT',this)">USDT</div>
+        <div class="tab" data-c="PP" onclick="sel('${p.id}','PP',this)">PayPal</div>
       </div>
       <div id="${p.id}-BTC"><div class="amt">${fmt(btc,8)} BTC</div><div class="addr">${BTC_ADDR}</div></div>
       <div id="${p.id}-ETH" style="display:none"><div class="amt">${fmt(eth,6)} ETH</div><div class="addr">${ETH_ADDR}</div></div>
       <div id="${p.id}-USDT" style="display:none"><div class="amt">${fmt(usdt,2)} USDT</div><div class="addr">${USDT_ADDR}</div></div>
-      <label class="lbl">Transaction ID / Hash</label>
+      <div id="${p.id}-PP" style="display:none"><div class="amt">$${p.usd} via PayPal</div><div class="ppwrap"><a class="pp" href="${PP_URL}" target="_blank">Pay $${p.usd} on PayPal →</a><p class="ppnote">Pay via <b>paypal.me/OmarShoaib215</b> — then click "I paid" to unlock your download.</p></div></div>
+      <label class="lbl">Transaction ID / Hash &#47; PayPal receipt</label>
       <input id="${p.id}-txid" placeholder="paste txid or 0x... hash" autocomplete="off">
       <button onclick="verify('${p.id}')">Verify & Unlock</button>
       <div class="msg" id="${p.id}-msg"></div>
@@ -78,8 +81,10 @@ function renderProducts(){
 }
 
 function sel(id, coin, el){
-  ["BTC","ETH","USDT"].forEach(c=>{
-    document.getElementById(`${id}-${c}`).style.display = c===coin?"block":"none";
+  ["BTC","ETH","USDT","PP"].forEach(c=>{
+    const el2 = document.getElementById(`${id}-${c}`);
+    if(c==="PP"){ el2.style.display = c===coin?"block":"none"; }
+    else { el2.style.display = c===coin?"block":"none"; }
   });
   const tabs = el.parentElement.querySelectorAll(".tab");
   tabs.forEach(t=>t.classList.toggle("on", t.dataset.c===coin));
@@ -87,11 +92,20 @@ function sel(id, coin, el){
 
 async function verify(id){
   const p = PRODUCTS.find(x=>x.id===id);
-  const coin = [...document.getElementById(`${id}-BTC`).parentElement.querySelectorAll(".tab")].find(t=>t.classList.contains("on")).dataset.c;
+  const tabs = document.getElementById(`${id}-BTC`).parentElement.querySelectorAll(".tab");
+  const coin = [...tabs].find(t=>t.classList.contains("on")).dataset.c;
   const txid = document.getElementById(`${id}-txid`).value.trim();
   const msg = document.getElementById(`${id}-msg`);
   const dl = document.getElementById(`${id}-dl`);
   msg.className="msg"; msg.textContent=""; dl.style.display="none";
+  if(coin==="PP"){
+    // PayPal: trust-based unlock. User paid via paypal.me/OmarShoaib215, then claims download.
+    // No webhook/integration — honest about it. Amount shown above; any payment unblocks.
+    msg.className="msg ok";
+    msg.textContent="PayPal unlocked. Download ready.";
+    dl.style.display="block";
+    return;
+  }
   if(!txid){ msg.className="msg err"; msg.textContent="Paste your transaction ID first."; return; }
   msg.className="msg"; msg.textContent="Verifying on-chain...";
   const slack = 0.98;
